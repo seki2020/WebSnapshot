@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -29,14 +30,23 @@ class WebScraper:
             total_height = driver.execute_script("return document.body.scrollHeight")
             driver.set_window_size(1920, total_height)
 
+            # Create directory for screenshots
+            screenshot_dir = 'screenshots'
+            if not os.path.exists(screenshot_dir):
+                os.makedirs(screenshot_dir)
+
+            # Generate file name based on current date and time
+            current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            screenshot_path = os.path.join(screenshot_dir, f'{current_datetime}.png')
+
             # Capture screenshot
-            screenshot_path = 'screenshot.png'
             driver.save_screenshot(screenshot_path)
 
             # Convert PNG to JPG
             image = Image.open(screenshot_path)
             image = image.convert('RGB')
-            image.save('screenshot.jpg', 'JPEG')
+            jpg_path = os.path.join(screenshot_dir, f'{current_datetime}.jpg')
+            image.save(jpg_path, 'JPEG')
 
             driver.quit()
             return html_content
@@ -58,7 +68,8 @@ class WebScraper:
         save_data(data, 'output.txt')  # Save as text file
 
 if __name__ == "__main__":
-    url = "https://findy-code.io/companies/503/jobs/edqXaFfV4CO0z"  # Replace with the target URL
+    url = "https://findy-code.io/recommends?sort=newest"  # Replace with the target URL
+    # url = "https://findy-code.io/companies/503/jobs/edqXaFfV4CO0z"  # Replace with the target URL
     # url = "https://example.com/"  # Replace with the target URL
     scraper = WebScraper(url)
     scraper.run()
